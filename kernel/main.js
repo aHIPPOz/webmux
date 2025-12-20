@@ -1,13 +1,40 @@
-import { Kernel } from "./kernel.js";
-import { mountRootFS } from "./fs/vfs.js";
+// kernel/main.js — kernel entry point
+// Exports kernelMain(bootInfo)
 
-export async function kernelMain(bootInfo) {
-  const kernel = new Kernel(bootInfo);
+import { Kernel } from './kernel.js';
 
-  await mountRootFS(kernel, bootInfo.rootfs);
+export async function kernelMain(bootInfo = {}) {
+console.log('kernelMain: starting with', bootInfo);
+const kernel = new Kernel(bootInfo);
 
-  // PID 1
-  kernel.spawn("/init.wasm", ["init"]);
+// initialize kernel subsystems and attempt to mount rootfs
+await kernel.initialize();
 
-  kernel.run();
+// Boot default init from rootfs (/sbin/init.wasm or /init.wasm)
+try {
+const initPathCandidates = ['/sbin/init.wasm', '/init.wasm'];
+let started = false;
+for (const p of initPathCandidates) {
+if (await kernel.vfs.exists(p)) {
+console.log('Launching init:', p);
+kernel.spawnFromVFS(p, ['init']);
+started = true;
+break;
+}
+}
+if (!started) {
+console.warn('No init found in rootfs — dropping to kernel shell');
+// try to spawn an embedded built-in demo or a shell fallback
+if (kernel.builtinHello) {
+kernel.spawnWasmBinary(kernel.builtinHello, { args: ['hello'] });
+}
+}
+} catch (e) {
+console.error('Error launching init:', e);
+}
+
+// let kernel scheduler run (cooperative)
+kernel.run();
+
+return kernel;
 }
