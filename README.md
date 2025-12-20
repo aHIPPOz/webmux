@@ -317,3 +317,121 @@ Licence personnalisée — voir `LICENSE`.
 
 GitHub : [https://github.com/aHIPPOz](https://github.com/aHIPPOz)
 Issues & PR bienvenues.
+
+---
+
+## Petites précisions importentes :
+
+### 1️⃣ Arborescence **réelle** du projet (à la racine)
+
+À la racine, **très peu de choses** :
+
+```txt
+/
+├── index.html
+├── boot.js
+└── kernel/
+```
+
+➡️ **PAS de** `ui/`, `rootfs/`, `packages/` à la racine.
+
+---
+
+### 2️⃣ Le dossier `kernel/` = tout le noyau + drivers JS
+
+Le dossier `kernel/` contient **uniquement ce qui est du ressort du noyau**, en JavaScript.
+
+Dans le kernel :
+
+* ✔️ Boot logique du système
+* ✔️ Runtime WASM / WASI **propriétaire**
+* ✔️ Implémentation POSIX / Linux syscalls
+* ✔️ Gestion OPFS
+* ✔️ Scheduler / process model
+* ✔️ Runner WASM
+* ✔️ Frontend graphique **minimal** pour :
+
+  * se connecter au `canvas`
+  * exposer framebuffer / input
+* ❌ **Aucune UI avancée**
+* ❌ **Pas de Wayland dans le kernel**
+
+➡️ Le kernel **expose juste des devices** (GPU, input, console), pas de compositor.
+
+---
+
+### 3️⃣ Wayland = **package WASM système**, pas kernel
+
+* Le backend compatible Wayland
+* Le compositor
+* Le protocole graphique
+
+➡️ Tout ça sera :
+
+* **un package WASM système**
+* installé dans le rootfs
+* lancé comme un **process userland**
+* communique avec le kernel via syscalls
+
+Exactement comme sur Linux :
+
+> kernel DRM / input → Wayland userland
+
+---
+
+### 4️⃣ RootFS : géré dynamiquement par le kernel
+
+* Le kernel **regarde dans OPFS** :
+
+  * si un rootfs existe déjà → il boote dessus
+  * sinon → il le télécharge depuis un **repo GitHub externe**
+* Le rootfs est :
+
+  * Linux-like
+  * arch = wasm / wasi custom
+  * persistant via OPFS
+
+➡️ Le kernel **ne contient pas le rootfs**, il le **monte**.
+
+---
+
+### 5️⃣ `wpm` = package WASM userland
+
+* Le kernel contient :
+
+  * le loader WASM
+  * l’executor
+  * le linker runtime
+* `wpm` :
+
+  * est un binaire WASM normal
+  * stocké dans le rootfs OPFS
+  * géré comme n’importe quel package
+
+➡️ Exactement comme `apt` sur Linux.
+
+---
+
+### 6️⃣ Frontend graphique : minimal, côté kernel
+
+Dans le kernel :
+
+* Création du canvas
+* Exposition d’un device type `/dev/fb0`
+* Gestion clavier / souris
+* Aucun layout, aucune fenêtre
+
+➡️ Tout ce qui est UI **avancée** est userland.
+
+---
+
+## 🧠 Résumé ultra-court
+
+* Kernel JS = **Linux kernel-like**
+* Wayland = **process WASM userland**
+* Rootfs = **OPFS monté dynamiquement**
+* wpm = **package WASM**
+* Canvas = **device**
+* Kernel = **aucune UI riche**
+
+---
