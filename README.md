@@ -18,6 +18,12 @@ Wasmux **n’est pas Linux**, mais implémente une **couche de compatibilité PO
 * Fournir un **gestionnaire de paquets Wasm (`wpm`)**
 * Être **100 % sandboxé**, sans dépendre d’un OS hôte spécifique
 
+**Plan** : boot → kernel → devices → syscalls → wasm runtime → userland
+                │
+                ├─ VFS (OPFS)
+                ├─ GPU (WebGPU)
+                └─ Net (loopback)
+
 ---
 
 ## 🧠 Philosophie
@@ -28,6 +34,14 @@ Wasmux **n’est pas Linux**, mais implémente une **couche de compatibilité PO
 Wasmux ne tente **pas** de recompiler Linux ou Wayland tels quels.
 Il implémente **les comportements observables nécessaires** pour faire fonctionner des applications POSIX modernes dans un environnement Wasm.
 
+---
+
+## Current status
+- Kernel structure: ✅
+- VFS + OPFS: ✅
+- WASI runtime: ⚠️ minimal
+- Userland: ❌ missing
+- Wayland: ❌ not started
 ---
 
 ## 🧩 Architecture globale
@@ -306,6 +320,12 @@ Wasmux peut fonctionner :
 * libc Wasmux
 * apps Wasm
 * tooling
+
+Good first contributions:
+- Implement missing syscalls
+- Improve WASI compatibility
+- Write small WASM userland tools
+- Add tests
 
 ---
 
