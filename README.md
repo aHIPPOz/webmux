@@ -1,6 +1,8 @@
 # **Wasmux v2 — WebAssembly Operating System Runtime**
 
-Wasmux est un **environnement d’exécution de type système d’exploitation**, écrit principalement en **JavaScript**, destiné à exécuter des applications **WebAssembly (Wasm)** compilées pour une **ABI POSIX-like custom basée sur WASI**, directement **dans le navigateur** ou dans des runtimes compatibles WebAssembly.
+Wasmux est un noyau POSIX en JavaScript qui exécute un userland Linux-like en WebAssembly, directement dans le navigateur.
+
+Plus concrètement Wasmux est un **environnement d’exécution de type système d’exploitation**, écrit principalement en **JavaScript**, destiné à exécuter des applications **WebAssembly (Wasm)** compilées pour une **ABI POSIX-like custom basée sur WASI**, directement **dans le navigateur** ou dans des runtimes compatibles WebAssembly.
 
 Wasmux **n’est pas Linux**, mais implémente une **couche de compatibilité POSIX/Linux userland** réaliste, portable et sécurisée, au-dessus des Web APIs modernes.
 
