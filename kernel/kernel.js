@@ -7,6 +7,8 @@
 //  - very small scheduler run() to keep alive processes
 
 import { untar } from './utils/untar.js'; // optional: if you factor utils; fallback included later
+import { registerNetDevice } from './devices/netcard.js';
+import { registerNetSyscalls } from './syscalls/net.js';
 
 // minimal in-file untar (fallback) — simple implementation
 async function tinyUntar(arrayBuffer) {
@@ -133,6 +135,26 @@ export class Kernel {
     } else {
       console.log('Rootfs present — ok');
     }
+    // create + register net device and expose network on kernel
+try {
+  // preferred: register via registry if available
+  if (this.devices && typeof this.devices.register === 'function') {
+  const netDev = await registerNetDevice(this.devices);
+  this.netDevice = netDev;
+  // expose convenient references
+  this.loopbackNet = netDev.getNetwork();
+  } else {
+  // fallback: create and attach
+  const netDev = await registerNetDevice(null);
+  this.netDevice = netDev;
+  this.loopbackNet = netDev.getNetwork();
+  }
+  // register syscalls that use kernel.loopbackNet
+  registerNetSyscalls(this);
+  console.log('Net device + syscalls registered');
+  } catch (e) {
+  console.warn('Failed to init net device:', e);
+  }
   }
 
   async downloadAndInstallRootfs(url) {
@@ -236,5 +258,11 @@ export class Kernel {
       setTimeout(tick, 100); // cooperative tick
     };
     tick();
+    this.syscalls = {};
+    registerFsSyscalls(this);
+    registerProcessSyscalls(this);
+    registerTimeSyscalls(this);
+    registerSignalSyscalls(this);
+    registerPollSyscalls(this);
   }
 }
