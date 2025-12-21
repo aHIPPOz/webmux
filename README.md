@@ -1,3 +1,6 @@
+---
+This project needs contributors to move from a skeleton to a working system. If you like OS internals, WASI or WebAssembly, your help matters.
+---
 # **Wasmux v2 — WebAssembly Operating System Runtime**
 
 Wasmux est un noyau POSIX en JavaScript qui exécute un userland Linux-like en WebAssembly, directement dans le navigateur.
