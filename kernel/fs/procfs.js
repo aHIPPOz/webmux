@@ -36,7 +36,27 @@ export function mountProcFS(vfs, { kernel }) {
     }
     }
     });
-    
+    // /proc/meminfo
+vfs.registerVirtual('/proc/meminfo', {
+  read: async () => {
+    // NOTE: This is a simplified, virtualized implementation
+    // similar to other /proc files in this environment.
+
+    const memTotalKB = 8 * 1024 * 1024; // 8 GB (fake / virtual)
+    const memFreeKB = 2 * 1024 * 1024;  // 2 GB free
+    const memAvailableKB = 3 * 1024 * 1024;
+
+    const s =
+      `MemTotal:       ${memTotalKB} kB\n` +
+      `MemFree:        ${memFreeKB} kB\n` +
+      `MemAvailable:   ${memAvailableKB} kB\n` +
+      `Buffers:        0 kB\n` +
+      `Cached:         0 kB\n`;
+
+    return new TextEncoder().encode(s);
+  }
+});
+
     
     // /proc/<pid>/status (for each process)
     vfs.registerVirtual('/proc', {
