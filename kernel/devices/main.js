@@ -11,16 +11,23 @@ import { RandomDevice } from './random.js';
 import { initUSB } from './usb.js';
 import { initHID } from './hid.js';
 import { initSerial } from './serial.js';
-
+import { AudioDevice } from './audio.js';
+import { ClipboardDevice } from './clipboard.js';
+import { ConsoleUIDevice } from './consoleui.js';
 
 export async function initDevices(kernel) {
 const registry = new DeviceRegistry();
 
+const consoleui = new ConsoleUIDevice();
+consoleui.init();
+registry.register(consoleui);
 
 // --- Static devices ---
 registry.register(new ConsoleDevice());
 registry.register(new ClockDevice());
 registry.register(new RandomDevice());
+registry.register(new AudioDevice());
+registry.register(new ClipboardDevice());
 
 
 const fb = new FramebufferDevice(kernel.bootInfo);

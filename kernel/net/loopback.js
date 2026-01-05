@@ -60,9 +60,15 @@ export class LoopbackNetwork {
     }
   
     createSocket() {
-      const sock = new LoopbackSocket(this);
-      this.sockets.add(sock);
-      return sock;
+      try {
+        const sock = new LoopbackSocket(this);
+        this.sockets.add(sock);
+        console.log('[LoopbackNetwork] Socket créé');
+        return sock;
+      } catch (e) {
+        console.error('[LoopbackNetwork] Erreur createSocket:', e);
+        throw e;
+      }
     }
   
     _registerSocket(addr, sock) {
@@ -115,9 +121,14 @@ export class LoopbackNetwork {
     }
   
     close() {
-      for (const s of Array.from(this.sockets)) s.close();
-      this.sockets.clear();
-      this.socketsByAddr.clear();
+      try {
+        for (const s of Array.from(this.sockets)) s.close();
+        this.sockets.clear();
+        this.socketsByAddr.clear();
+        console.log('[LoopbackNetwork] Fermé');
+      } catch (e) {
+        console.error('[LoopbackNetwork] Erreur close:', e);
+      }
     }
   }
   
@@ -130,21 +141,33 @@ export class LoopbackNetwork {
     }
   
     async bind(addr) {
-      if (this.closed) throw new Error('socket closed');
-      if (!addr) {
-        // allocate ephemeral port
-        addr = `:${this.net.nextAutoPort++}`;
+      try {
+        if (this.closed) throw new Error('socket closed');
+        if (!addr) {
+          addr = `:${this.net.nextAutoPort++}`;
+        }
+        addr = this.net._normalizeAddr(addr);
+        this.localAddr = addr;
+        this.net._registerSocket(addr, this);
+        console.log('[LoopbackSocket] Bind:', addr);
+        return addr;
+      } catch (e) {
+        console.error('[LoopbackSocket] Erreur bind:', e);
+        throw e;
       }
-      addr = this.net._normalizeAddr(addr);
-      this.localAddr = addr;
-      this.net._registerSocket(addr, this);
-      return addr;
     }
   
     async send(toAddr, uint8arr) {
-      if (this.closed) throw new Error('socket closed');
-      const from = this.localAddr || `:auto-${Math.floor(Math.random()*1e6)}`;
-      return await this.net.send(from, toAddr, uint8arr);
+      try {
+        if (this.closed) throw new Error('socket closed');
+        const from = this.localAddr || `:auto-${Math.floor(Math.random()*1e6)}`;
+        const res = await this.net.send(from, toAddr, uint8arr);
+        console.log('[LoopbackSocket] Send:', from, '->', toAddr, 'octets:', uint8arr.length);
+        return res;
+      } catch (e) {
+        console.error('[LoopbackSocket] Erreur send:', e);
+        throw e;
+      }
     }
   
     _onInbound(fromAddr, uint8arr) {
@@ -155,10 +178,15 @@ export class LoopbackNetwork {
     }
   
     async close() {
-      if (this.closed) return;
-      if (this.localAddr) this.net._unregisterSocket(this.localAddr, this);
-      this.closed = true;
-      this.net.sockets.delete(this);
+      try {
+        if (this.closed) return;
+        if (this.localAddr) this.net._unregisterSocket(this.localAddr, this);
+        this.closed = true;
+        this.net.sockets.delete(this);
+        console.log('[LoopbackSocket] Fermé');
+      } catch (e) {
+        console.error('[LoopbackSocket] Erreur close:', e);
+      }
     }
   }
   

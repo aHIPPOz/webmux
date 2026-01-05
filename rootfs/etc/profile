@@ -1,0 +1,15 @@
+# Wasmux default shell profile
+export PATH=/usr/local/bin:/usr/bin:/bin
+export HOME=/home/guest
+export SHELL=/bin/sh
+export TERM=xterm
+export LANG=en_US.UTF-8
+
+# Prompt
+PS1='wasmux $ '
+
+# Aliases
+alias ls='ls -la'
+alias ll='ls -la'
+alias la='ls -a'
+alias l='ls -CF'

@@ -1,0 +1,14 @@
+{
+  "name": "system-libs",
+  "version": "1.0.0",
+  "arch": "wasm32",
+  "abi": "wasmux-wasi",
+  "type": "system",
+  "libs": [
+    "libc.a",
+    "libm.a",
+    "libpthread.a"
+  ],
+  "installed": true,
+  "timestamp": "2026-01-05T00:00:00Z"
+}

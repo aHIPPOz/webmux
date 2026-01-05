@@ -1,0 +1,52 @@
+[package]
+name = "wasmux-coreutils"
+version = "1.0.0"
+edition = "2021"
+
+[dependencies]
+wasmux-libc = { path = "../libc-wrapper" }
+
+[profile.release]
+opt-level = "z"
+lto = true
+strip = true
+
+[[bin]]
+name = "ls"
+path = "src/ls.rs"
+
+[[bin]]
+name = "cat"
+path = "src/cat.rs"
+
+[[bin]]
+name = "echo"
+path = "src/echo.rs"
+
+[[bin]]
+name = "mkdir"
+path = "src/mkdir.rs"
+
+[[bin]]
+name = "rm"
+path = "src/rm.rs"
+
+[[bin]]
+name = "cp"
+path = "src/cp.rs"
+
+[[bin]]
+name = "mv"
+path = "src/mv.rs"
+
+[[bin]]
+name = "touch"
+path = "src/touch.rs"
+
+[[bin]]
+name = "whoami"
+path = "src/whoami.rs"
+
+[[bin]]
+name = "pwd"
+path = "src/pwd.rs"

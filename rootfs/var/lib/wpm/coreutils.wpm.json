@@ -1,0 +1,16 @@
+{
+  "name": "coreutils",
+  "version": "1.0.0",
+  "arch": "wasm32",
+  "abi": "wasmux-wasi",
+  "type": "application",
+  "binaries": [
+    "ls",
+    "cat",
+    "echo",
+    "mkdir",
+    "rm"
+  ],
+  "installed": true,
+  "timestamp": "2026-01-05T00:00:00Z"
+}

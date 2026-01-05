@@ -1,0 +1,16 @@
+[package]
+name = "wasmux-sh"
+version = "1.0.0"
+edition = "2021"
+
+[dependencies]
+wasmux-libc = { path = "../libc-wrapper" }
+
+[profile.release]
+opt-level = "z"
+lto = true
+strip = true
+
+[[bin]]
+name = "sh"
+path = "src/main.rs"

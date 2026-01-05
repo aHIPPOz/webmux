@@ -1,0 +1,19 @@
+#!/bin/sh
+# wpm - Wasmux Package Manager
+# Usage: wpm <command> [package]
+
+case "$1" in
+  install)
+    echo "Installing package: $2"
+    ;;
+  list)
+    echo "Installed packages:"
+    ls -la /var/lib/wpm/
+    ;;
+  remove)
+    echo "Removing package: $2"
+    ;;
+  *)
+    echo "Usage: wpm {install|list|remove} [package]"
+    ;;
+esac
