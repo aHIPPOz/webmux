@@ -1,8 +1,0 @@
-#!/bin/sh
-# Wasmux shell - command interpreter
-
-echo "Wasmux Shell v1.0"
-echo "Type 'help' for available commands"
-echo ""
-
-# Shell loop would be implemented here

@@ -7,7 +7,7 @@ set -e
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SOURCE_DIR="$PROJECT_ROOT/source"
 ROOTFS_DIR="$PROJECT_ROOT/rootfs"
-BIN_DIR="$PROJECT_ROOT/bin"
+BIN_DIR="$PROJECT_ROOT/rootfs/bin"
 
 echo "╔════════════════════════════════════════════════════════════╗"
 echo "║         Wasmux Build System - WASM Compilation            ║"
