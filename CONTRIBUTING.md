@@ -1,3 +1,6 @@
+> ⚠️ Wasmux is currently in an early bootstrapping phase.
+> Contributions that unblock the boot process are the highest priority.
+
 # Contributing to Wasmux
 
 Wasmux is a WebAssembly operating system written in JavaScript and Rust. We welcome contributions!
@@ -54,4 +57,53 @@ webmux/
 2. Check kernel boot sequence logs
 3. Verify filesystem loads properly
 
+## 🚧 Known Blocking Issues (Good First Tasks)
+
+### ❌ RootFS download fails due to CORS (BOOT BLOCKER)
+
+**Status:** 🔴 Blocking boot  
+**Difficulty:** 🟢 Good first issue  
+**Area:** Kernel / Boot / FS  
+
+#### Symptoms
+Boot fails during RootFS initialization with the following error:
+
+```
+
+Access to fetch at
+[https://github.com/aHIPPOz/wasmux-rootfs/releases/latest/download/rootfs.tar](https://github.com/aHIPPOz/wasmux-rootfs/releases/latest/download/rootfs.tar)
+has been blocked by CORS policy:
+No 'Access-Control-Allow-Origin' header is present
+
+```
+
+This causes:
+```
+
+Rootfs install failed: Failed to fetch
+BOOT FAILED
+
+```
+
+#### Where it happens
+- `kernel/kernel.js`
+- Method: `downloadAndInstallRootfs()`
+- Triggered during kernel initialization when no local rootfs is detected.
+
+#### Why this matters
+Without fixing this, **Wasmux cannot boot on a clean install**.
+This blocks all further development (syscalls, scheduler, UI, WASM runtime).
+
+#### How to solve this:
+Replace calls to this non-existent repository with calls using relative paths to the rootfs directory.
+
+#### How to contribute
+1. Fork the repo
+2. Create a branch: `fix/rootfs-cors`
+3. Propose a solution (code + explanation)
+4. Open a Pull Request describing:
+   - The approach chosen
+   - Pros / cons
+   - Browser compatibility
+---
 See `README.md` for full documentation.
