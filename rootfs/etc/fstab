@@ -1,0 +1,5 @@
+# Wasmux rootfs - OPFS virtual filesystem
+# Virtual filesystems - mounted by kernel
+/dev/opfs	/	    opfs	rw	0 0
+/dev/tmpfs	/tmp	tmpfs	rw	0 0
+/dev/devfs	/dev	devfs	rw	0 0

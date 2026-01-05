@@ -1,0 +1,29 @@
+{
+  "version": "1.0.0",
+  "name": "wasmux",
+  "os": "wasmux",
+  "arch": "wasm32",
+  "abi": "wasmux-wasi",
+  "description": "Wasmux WebAssembly Operating System Root Filesystem",
+  "bootloader": "/sbin/init.wasm",
+  "shell": "/bin/sh",
+  "init_cmd": "/sbin/init",
+  "features": {
+    "posix_syscalls": true,
+    "opfs_persistence": true,
+    "wasm_runtime": true,
+    "package_manager": "wpm"
+  },
+  "permissions": [
+    "fs",
+    "time",
+    "process",
+    "signal",
+    "network"
+  ],
+  "system_packages": [
+    "core-utils",
+    "system-libs"
+  ],
+  "timestamp": "2026-01-05T00:00:00Z"
+}

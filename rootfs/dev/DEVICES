@@ -1,0 +1,11 @@
+# Wasmux device file stubs
+# These are virtual device references managed by the kernel
+
+/dev/fb0    - Framebuffer (display)
+/dev/input  - Input device
+/dev/null   - Null device
+/dev/zero   - Zero device
+/dev/random - Random device
+/dev/urandom - Urandom device
+/dev/console - Console
+/dev/tty    - TTY device

@@ -1,0 +1,28 @@
+#!/bin/sh
+# Wasmux init - system initialization
+# This is invoked by the kernel boot sequence
+
+echo "[Init] Wasmux system starting..."
+echo "[Init] POSIX syscalls: available"
+echo "[Init] OPFS persistence: mounted"
+echo "[Init] WASM runtime: ready"
+
+# Mount virtual filesystems
+mount -t tmpfs none /tmp
+mount -t devfs none /dev
+
+# Create system files
+touch /var/log/system.log
+touch /var/run/boot.lock
+
+# Set hostname
+hostname wasmux
+
+# Source profile
+. /etc/profile
+
+echo "[Init] System ready"
+echo "[Init] Launching shell..."
+
+# Start shell
+exec /bin/sh

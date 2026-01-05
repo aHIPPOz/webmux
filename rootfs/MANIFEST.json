@@ -1,0 +1,220 @@
+{
+  "name": "wasmux-rootfs",
+  "version": "1.0.0",
+  "description": "Complete WebAssembly rootfs for Wasmux kernel",
+  "architecture": "wasm32",
+  "abi": "wasmux-wasi",
+  "bootloader": "/sbin/init.wasm",
+  "shell": "/bin/sh",
+  "metadata_file": "/.wasmux.json",
+  
+  "directories": [
+    "/bin",
+    "/sbin",
+    "/etc",
+    "/home",
+    "/lib",
+    "/tmp",
+    "/usr",
+    "/usr/bin",
+    "/usr/lib",
+    "/usr/share",
+    "/var",
+    "/var/lib/wpm",
+    "/var/run",
+    "/var/log",
+    "/dev"
+  ],
+  
+  "config_files": {
+    "/etc/passwd": {
+      "type": "text",
+      "format": "posix-passwd",
+      "users": ["root", "guest"]
+    },
+    "/etc/group": {
+      "type": "text",
+      "format": "posix-group",
+      "groups": ["root", "wheel", "users"]
+    },
+    "/etc/hostname": {
+      "type": "text",
+      "content": "wasmux"
+    },
+    "/etc/hosts": {
+      "type": "text",
+      "content": "localhost mapping"
+    },
+    "/etc/fstab": {
+      "type": "text",
+      "mounts": [
+        { "device": "/dev/opfs", "mountpoint": "/", "fstype": "opfs" },
+        { "device": "/dev/tmpfs", "mountpoint": "/tmp", "fstype": "tmpfs" },
+        { "device": "/dev/devfs", "mountpoint": "/dev", "fstype": "devfs" }
+      ]
+    },
+    "/etc/profile": {
+      "type": "text",
+      "format": "shell-script"
+    },
+    "/etc/environment": {
+      "type": "text",
+      "variables": {
+        "ARCH": "wasm32",
+        "ABI": "wasmux-wasi",
+        "TERM": "xterm"
+      }
+    }
+  },
+  
+  "binaries": {
+    "/sbin/init": {
+      "type": "wasm",
+      "entry_point": "main",
+      "required_syscalls": ["mount", "exec", "fork", "exit"]
+    },
+    "/bin/sh": {
+      "type": "wasm",
+      "entry_point": "main",
+      "required_syscalls": ["read", "write", "open", "close", "getpwuid", "uname"]
+    },
+    "/usr/bin/wpm": {
+      "type": "script",
+      "interpreter": "/bin/sh",
+      "subcommands": ["install", "list", "remove", "update"]
+    }
+  },
+  
+  "syscalls": {
+    "required": [
+      "open", "close", "read", "write", "stat", "fstat", "lstat",
+      "mount", "umount", "mkdir", "rmdir", "unlink",
+      "fork", "exec", "exit", "wait", "getpid", "getppid",
+      "getuid", "getgid", "setuid", "setgid",
+      "uname", "getpwuid", "getpwnam", "getgrgid", "getgrnam",
+      "time", "clock_gettime", "nanosleep",
+      "read", "readv", "write", "writev",
+      "mmap", "munmap", "mprotect",
+      "signal", "sigaction", "sigprocmask", "kill"
+    ],
+    "optional": [
+      "pipe", "poll", "select", "epoll",
+      "socket", "connect", "listen", "accept",
+      "sendto", "recvfrom", "setsockopt",
+      "ioctl", "fcntl"
+    ]
+  },
+  
+  "features": {
+    "posix_compatibility": true,
+    "opfs_persistence": true,
+    "wasm_runtime": true,
+    "package_manager": "wpm",
+    "multi_user": true,
+    "process_control": true,
+    "virtual_filesystem": true
+  },
+  
+  "packages": {
+    "system-libs": {
+      "version": "1.0.0",
+      "location": "/var/lib/wpm/",
+      "components": ["libc", "libm", "libpthread"]
+    },
+    "coreutils": {
+      "version": "1.0.0",
+      "location": "/var/lib/wpm/",
+      "binaries": ["ls", "cat", "echo", "mkdir", "rm", "cp", "mv"]
+    }
+  },
+  
+  "boot_sequence": [
+    {
+      "step": 1,
+      "description": "Load rootfs metadata",
+      "file": "/.wasmux.json"
+    },
+    {
+      "step": 2,
+      "description": "Initialize filesystem",
+      "command": "VFS.mount(/dev/opfs, /)"
+    },
+    {
+      "step": 3,
+      "description": "Load user database",
+      "file": "/etc/passwd"
+    },
+    {
+      "step": 4,
+      "description": "Register syscalls",
+      "modules": ["process", "signal", "time", "poll", "net"]
+    },
+    {
+      "step": 5,
+      "description": "Execute boot binary",
+      "binary": "/sbin/init.wasm"
+    },
+    {
+      "step": 6,
+      "description": "Run init system",
+      "script": "/sbin/init"
+    },
+    {
+      "step": 7,
+      "description": "Start shell",
+      "shell": "/bin/sh"
+    }
+  ],
+  
+  "kernel_integration": {
+    "module": "kernel/rootfs/manager.js",
+    "class": "RootfsManager",
+    "initialization_function": "initializeRootfs(kernel)",
+    "exports": [
+      "RootfsManager",
+      "initializeRootfs"
+    ],
+    "syscalls_registered": [
+      "uname",
+      "getpwuid",
+      "getpwnam"
+    ]
+  },
+  
+  "environment": {
+    "default_user": "guest",
+    "default_shell": "/bin/sh",
+    "default_home": "/home/guest",
+    "system_users": ["root"],
+    "standard_paths": {
+      "PATH": "/usr/local/bin:/usr/bin:/bin",
+      "MANPATH": "/usr/share/man",
+      "LIBPATH": "/usr/lib:/lib"
+    }
+  },
+  
+  "device_mappings": {
+    "/dev/null": { "major": 1, "minor": 3, "type": "char" },
+    "/dev/zero": { "major": 1, "minor": 5, "type": "char" },
+    "/dev/random": { "major": 1, "minor": 8, "type": "char" },
+    "/dev/urandom": { "major": 1, "minor": 9, "type": "char" },
+    "/dev/fb0": { "major": 29, "minor": 0, "type": "char", "purpose": "framebuffer" },
+    "/dev/input": { "major": 13, "minor": 0, "type": "char", "purpose": "input devices" },
+    "/dev/console": { "major": 5, "minor": 1, "type": "char", "purpose": "console" },
+    "/dev/tty": { "major": 5, "minor": 0, "type": "char", "purpose": "terminal" }
+  },
+  
+  "checksums": {
+    "algorithm": "sha256",
+    "rootfs_archive": "",
+    "individual_files": {}
+  },
+  
+  "deployment": {
+    "method": "embed|download|bundle",
+    "location": "/workspaces/webmux/rootfs",
+    "archive_format": "tar.gz|zip",
+    "size_uncompressed": "~2MB",
+    "size_compressed": "~500KB"
+  }
+}

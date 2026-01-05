@@ -1,0 +1,16 @@
+[package]
+name = "wasmux-init"
+version = "1.0.0"
+edition = "2021"
+
+[dependencies]
+wasmux-libc = { path = "../libc-wrapper" }
+
+[profile.release]
+opt-level = "z"
+lto = true
+strip = true
+
+[[bin]]
+name = "init"
+path = "src/main.rs"
